@@ -1,5 +1,5 @@
 export default defineContentScript({
-  matches: ["*://*"],
+  matches: ["https://*/*"],
   main(ctx) {
     console.log("hello", getInputs());
     // const textAreaElements = document.querySelectorAll(
