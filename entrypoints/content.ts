@@ -26,10 +26,10 @@ export default defineContentScript({
 });
 
 function getInputs() {
-  let formFields: NodeListOf<
+  let formFields: Record<string, any>[] = [];
+  const formElements = document.querySelectorAll<
     HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-  > = [];
-  const formElements = document.querySelectorAll("input, select, textarea");
+  >("input, select, textarea");
 
   formElements.forEach((element, index) => {
     if ("type" in element) {
@@ -54,19 +54,94 @@ function getInputs() {
       }
     }
 
-    const fieldData = {
-      id: crypto.randomUUID(),
-      element: {
-        tagName: element.tagName,
-        type: element.type || null,
-        name: element.name || null,
-        id: element.id || null,
-        className: element.className || null,
-      },
-    };
+    // const fieldData = {
+    //   id: crypto.randomUUID(),
+    //   element: {
+    //     tagName: element.tagName,
+    //     type: element.type || null,
+    //     name: element.name || null,
+    //     id: element.id || null,
+    //     className: element.className || null,
+    //   },
+    // };
+
+    const fieldData = createFormFieldData(element);
+    if (!fieldData) return;
 
     formFields.push(fieldData);
   });
 
   return formFields;
+}
+
+function createFormFieldData(
+  element: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+) {
+  const tagName = element.tagName.toLowerCase();
+  const type = (element.getAttribute("type") || tagName).toLowerCase();
+
+  if (["hidden", "submit", "button", "reset", "file"].includes(type))
+    return null;
+  if (element.disabled || (element as HTMLInputElement).readOnly) return null;
+
+  let value = "";
+  if (type === "checkbox" || type === "radio") {
+    value = (element as HTMLInputElement).checked ? "true" : "false";
+  } else {
+    value = element.value || "";
+  }
+
+  return {
+    id: crypto.randomUUID(),
+    element: {
+      id: element.id || "",
+      name: element.name || "",
+      tagName: element.tagName,
+      type,
+      label: getLabelForElement(element),
+      placeholder:
+        (element as HTMLInputElement | HTMLTextAreaElement).placeholder || "",
+      required:
+        (element as HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement)
+          .required || false,
+      value,
+    },
+  };
+}
+
+function getLabelForElement(
+  element: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+): string {
+  if (element.id) {
+    const label = document.querySelector(`label[for="${element.id}"]`);
+    if (label) return label.textContent?.trim() || "";
+  }
+
+  const parentLabel = element.closest("label");
+  if (parentLabel) {
+    return (
+      parentLabel.textContent?.replace(element.value || "", "").trim() || ""
+    );
+  }
+
+  const ariaLabel = element.getAttribute("aria-label");
+  if (ariaLabel) return ariaLabel.trim();
+
+  const ariaLabelledBy = element.getAttribute("aria-labelledby");
+  if (ariaLabelledBy) {
+    const labelElement = document.getElementById(ariaLabelledBy);
+    if (labelElement) return labelElement.textContent?.trim() || "";
+  }
+
+  const prev = element.previousElementSibling;
+  if (
+    prev &&
+    !["input", "select", "textarea", "button", "label"].includes(
+      prev.tagName.toLowerCase()
+    )
+  ) {
+    return prev.textContent?.trim() || "";
+  }
+
+  return "";
 }
