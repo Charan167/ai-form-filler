@@ -1,7 +1,23 @@
 export function getInputs() {
   let formFields: Record<
     string,
-    Record<string, string | number | null> | string | number | null
+    | Record<
+        string,
+        | string
+        | number
+        | null
+        | boolean
+        | string[]
+        | Record<string, string | number | boolean | string[] | number[] | null>
+        | Record<string, string>[]
+        | boolean
+      >
+    | string
+    | number
+    | string[]
+    | number[]
+    | boolean
+    | null
   >[] = [];
   const formElements = document.querySelectorAll(
     "input, select, textarea",
@@ -51,6 +67,7 @@ export function getInputs() {
       label: getFieldLabel(element),
       specs: getFieldSpecs(element),
       outContext: getFieldContext(element),
+      positionOnScreen: getElementPosition(element),
     };
 
     formFields.push(fieldData);
@@ -225,5 +242,17 @@ function getFieldContext(
     sectionClass: section ? section.className : null,
     sectionId: section ? section.id : null,
     fieldIndex: Array.from(form ? form.elements : [element]).indexOf(element),
+  };
+}
+
+function getElementPosition(
+  element: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement,
+) {
+  const rect = element.getBoundingClientRect();
+  return {
+    top: rect.top + window.scrollY,
+    left: rect.left + window.scrollX,
+    width: rect.width,
+    height: rect.height,
   };
 }
