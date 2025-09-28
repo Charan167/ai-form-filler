@@ -53,6 +53,9 @@ function getInputs() {
         return;
       }
     }
+    if (!element.id) {
+      element.id = crypto.randomUUID();
+    }
 
     const fieldData = {
       id: crypto.randomUUID(),
