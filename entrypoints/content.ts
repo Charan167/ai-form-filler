@@ -26,13 +26,17 @@ export default defineContentScript({
 });
 
 function getInputs() {
-  let formFields: NodeListOf<
-    HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-  > = [];
+  let formFields: Record<
+    string,
+    Record<string, string | number | null> | string | number | null
+  >[] = [];
   const formElements = document.querySelectorAll("input, select, textarea");
 
   formElements.forEach((element, index) => {
+    let elementType: string | unknown = "";
+    let elementName: string | unknown = "";
     if ("type" in element) {
+      elementType = element.type;
       if (
         element.type === "hidden" ||
         element.type === "button" ||
@@ -42,8 +46,11 @@ function getInputs() {
         return;
       }
     }
+    if ("name" in element) {
+      elementName = element.name;
+    }
     if ("style" in element) {
-      if (element.style.display === "none") {
+      if ((element as HTMLElement).style.display === "none") {
         return;
       }
     }
@@ -61,8 +68,8 @@ function getInputs() {
       id: crypto.randomUUID(),
       element: {
         tagName: element.tagName,
-        type: element.type || null,
-        name: element.name || null,
+        type: (elementType as string) || null,
+        name: (elementName as string) || null,
         id: element.id || null,
         className: element.className || null,
       },
