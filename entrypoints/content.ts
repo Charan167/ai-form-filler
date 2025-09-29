@@ -1,3 +1,5 @@
+import { getInputs } from "./GetInputs/main";
+
 export default defineContentScript({
   matches: ["https://*/*"],
   main(ctx) {
