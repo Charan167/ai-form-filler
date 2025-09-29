@@ -1,24 +1,7 @@
-export function getInputs() {
-  let formFields: Record<
-    string,
-    | Record<
-        string,
-        | string
-        | number
-        | null
-        | boolean
-        | string[]
-        | Record<string, string | number | boolean | string[] | number[] | null>
-        | Record<string, string>[]
-        | boolean
-      >
-    | string
-    | number
-    | string[]
-    | number[]
-    | boolean
-    | null
-  >[] = [];
+import { IFormFields } from "./Iinputs";
+
+export default function getInputs() {
+  let formFields: IFormFields[] = [];
   const formElements = document.querySelectorAll(
     "input, select, textarea",
   ) as NodeListOf<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>;
