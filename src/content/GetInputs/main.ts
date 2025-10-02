@@ -35,7 +35,8 @@ export default function getInputs() {
       }
     }
     if (!element.id) {
-      element.id = crypto.randomUUID();
+      element.id = "index-" + index;
+      // element.id = crypto.randomUUID();
     }
 
     const fieldData = {
