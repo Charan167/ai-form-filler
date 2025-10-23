@@ -9,6 +9,7 @@ export function getPageContext() {
       tag: element?.tagName,
       id: element?.id,
       innerText: element?.innerHTML,
+      url: window.location.href
     })
   );
 
