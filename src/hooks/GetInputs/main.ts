@@ -1,9 +1,10 @@
 import { IFormFields } from "./Iinputs";
+import { getPageContext } from "./pageContext";
 
 export default function getInputs() {
   let formFields: IFormFields[] = [];
   const formElements = document.querySelectorAll(
-    "input, select, textarea",
+    "input, select, textarea"
   ) as NodeListOf<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>;
 
   formElements.forEach((element, index) => {
@@ -47,10 +48,12 @@ export default function getInputs() {
         id: element.id || null,
         className: element.className || null,
       },
+      parentInfo: element.parentElement?.innerText || null,
       label: getFieldLabel(element),
       specs: getFieldSpecs(element),
       outContext: getFieldContext(element),
       positionOnScreen: getElementPosition(element),
+      pageContext: getPageContext(),
     };
 
     formFields.push(fieldData);
@@ -60,7 +63,7 @@ export default function getInputs() {
 }
 
 function getFieldLabel(
-  element: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement,
+  element: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
 ) {
   if (element.id) {
     const label = document.querySelector(`label[for="${element.id}"]`);
@@ -96,7 +99,7 @@ function getFieldLabel(
 }
 
 function findNearbyText(
-  element: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement,
+  element: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
 ) {
   const parent = element.parentElement;
   if (!parent) return null;
@@ -121,7 +124,7 @@ function findNearbyText(
 }
 
 function getFieldSpecs(
-  element: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement,
+  element: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
 ) {
   const type = element.type || element.tagName.toLowerCase();
   const constraints = {
@@ -158,7 +161,7 @@ function getFieldSpecs(
 }
 
 function determineSemanticType(
-  element: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement,
+  element: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
 ) {
   const label = getFieldLabel(element).toLowerCase();
   const name = (element.name || "").toLowerCase();
@@ -214,7 +217,7 @@ function determineSemanticType(
   return "text";
 }
 function getFieldContext(
-  element: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement,
+  element: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
 ) {
   const form = element.closest("form");
   const section = element.closest('section, div[class*="section"], fieldset');
@@ -229,7 +232,7 @@ function getFieldContext(
 }
 
 function getElementPosition(
-  element: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement,
+  element: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
 ) {
   const rect = element.getBoundingClientRect();
   return {
